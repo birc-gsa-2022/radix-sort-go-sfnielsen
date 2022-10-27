@@ -1,42 +1,35 @@
 package gsa
 
 import (
-	"fmt"
-	"sort"
 	"strings"
 )
 
 // Sort the string x using a count sort
 func CountSort(x string) string {
-	var sb strings.Builder
-	counts := make(map[byte]int)
-	keys := []int{}
-	//count occourences
-	for i := range x {
-		if _, ok := counts[x[i]]; !ok {
-			keys = append(keys, int(x[i]))
-		}
-		counts[x[i]]++
-	}
+	var counts [256]int
 
-	//IS THIS OKAY ??? k log k. Should still be constant or order 'len x' in normal cases?
-	sort.Ints(keys)
+	//count occourences
+	for _, b := range []byte(x) {
+		counts[b]++
+	}
 
 	//create ordered string
-	for _, k := range keys {
-		v := counts[byte(k)]
-		for i := 0; i < v; i++ {
-			sb.WriteByte(byte(k))
+	x_s := make([]byte, len(x))
+	idx := 0
+	for i, occ := range counts {
+		for j := 0; j < occ; j++ {
+			x_s[idx] = byte(i)
+			idx++
 		}
 	}
-	return sb.String()
+
+	return string(x_s)
 }
 
 // Sort the indices in idx according to the letters in x
 // using a bucket sort
 func BucketSort(x string, idx []int) []int {
 	xs := CountSort(x)
-
 	buckets := make(map[rune]int) //create first bucket beggining at 0
 	//create buckets with accumulated values
 	for i, v := range xs {
@@ -84,8 +77,6 @@ func LsdRadixSort(x string) []int {
 		}
 		idx = BucketSort(sb.String(), idx)
 	}
-	fmt.Println(idx)
-
 	return idx
 }
 
